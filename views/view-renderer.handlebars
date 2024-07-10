@@ -15,7 +15,7 @@
     <!--        http://spx.graphics        -->
     <!--                                   -->
     <!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
-    
+
     <!--
       Scripts, no frameworks.
       "Some extract of vanilla, enough to feed Godzilla."
@@ -43,7 +43,7 @@
 
         #root {
             padding: 0px;
-            /* MAIN RENDERER size set by SPX to {{width}}x{{height}} */ 
+            /* MAIN RENDERER size set by SPX to {{width}}x{{height}} */
             width: {{width}};
             height: {{height}};
             position: relative;
@@ -51,7 +51,7 @@
             background-size: 100% 100%;
             background-color: rgba(0,0,0,0);
         }
-        
+
         #overlays {
             top: 0;
             left: 0;
@@ -121,7 +121,12 @@
         let incomingData; // a placeholder for templateData
         let WMtimer = null;
         let startTime = new Date().getTime();
-        const inController = top.location.href.includes('renderer') ? false : true; 
+        let inController = false;
+        try {
+            inController = top.location.href.includes('renderer') ? false : true;
+        } catch (e) {
+            inController = false;
+        }
 
         function allowLayerControl(LayerNro) {
             // Usage:
@@ -194,10 +199,15 @@
         }
 
         function isLocalRenderer() {
-            if (top.location.href.includes('renderer')) {
-                // console.log('Nope, this is a remote renderer.');
-                return false
-            } else {
+            try {
+                if (top.location.href.includes('renderer')) {
+                    // console.log('Nope, this is a remote renderer.');
+                    return false
+                } else {
+                    // console.log('Yes, this is a local renderer.');
+                    return true
+                }
+            } catch (e) {
                 // console.log('Yes, this is a local renderer.');
                 return true
             }
@@ -217,7 +227,7 @@
         function echo(msg) {
             document.getElementById('debugMessage').innerText=msg;
         }
-        
+
         function spxWM(mode=0,ref=0, minMins=15, maxMins=30) {
             // Added in 1.3.0
             // Watermark player. PANIC will kill this also.
@@ -273,7 +283,7 @@
                 case 'stop':
                     console.log('3: spxWM stop');
                     clearTimeout(WMtimer);
-                    WMtimer = null; 
+                    WMtimer = null;
                     player.stop();
                     player.style.opacity=0;
                     break;
@@ -295,7 +305,7 @@
                         } else {
                             // Not running, purge just in case
                             clearTimeout(WMtimer);
-                            WMtimer = null; 
+                            WMtimer = null;
                         }
                     }, fadeOutAfter*1000);
                     break;
@@ -339,7 +349,7 @@
             window.resizeTo(w, h);
 
        }
-            
+
         function remoteFunction(LayerNro, functionName, arg) {
             // console.log('remoteFunction ' + LayerNro);
             // LayerNro = validateLayerNro(LayerNro);
@@ -382,7 +392,7 @@
             if (!LayerNro) { return }
             let iframeID = 'layer' + LayerNro;
             let formattedJSON = formatJSONAndSetDomFields(fieldData, iframeID);
-            document.getElementById(iframeID).contentWindow.update(formattedJSON); 
+            document.getElementById(iframeID).contentWindow.update(formattedJSON);
             document.getElementById(iframeID).contentWindow.play();
         }
 
@@ -419,7 +429,7 @@
         }
 
         // init communications
-        var url_string = window.location.href; // "http://www.example.com/index.html?gc=http://192.168.1.44:5656"; 
+        var url_string = window.location.href; // "http://www.example.com/index.html?gc=http://192.168.1.44:5656";
         var url = new URL(url_string);
         let TemplateRoot;
         var GCserver = url.searchParams.get("gc") || undefined;
@@ -550,7 +560,7 @@
                                 warning    += 'You had a call [' + data.invoke + '].\n\n';
                                 console.warn(warning);
                                 let myFunction = data.invoke.split('(')[0]; // Checking if template has this function
-                                if (typeof document.getElementById('layer' + LayerNro).contentWindow[myFunction] === "function") { 
+                                if (typeof document.getElementById('layer' + LayerNro).contentWindow[myFunction] === "function") {
                                     console.log('Evaluating existing function "' + data.invoke + '" on layer ' + LayerNro + '.');
                                     eval("document.getElementById('layer' + " + LayerNro + ").contentWindow." + data.invoke);
                                     // TODO: This should be removed in the future.
