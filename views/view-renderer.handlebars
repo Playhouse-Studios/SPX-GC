@@ -330,14 +330,14 @@
             const urlParams     = new URLSearchParams(queryString);
             const fps           = urlParams.get('fps');
 
-            if (!window.top.spxRenderer) { window.top.spxRenderer = {} }
+            if (!window.spxRenderer) { window.spxRenderer = {} }
 
             if (fps) {
                 console.log('Framerate specified: ' + fps + ' FPS.');
-                window.top.spxRenderer.fps = fps;
+                window.spxRenderer.fps = fps;
             } else {
                 // console.log('Framerate not specified.');
-                window.top.spxRenderer.fps = null;
+                window.spxRenderer.fps = null;
             }
 
             // Resize window according to resolution
